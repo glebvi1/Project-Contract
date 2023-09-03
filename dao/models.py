@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import mapped_column, relationship
 
-from dao import STATUS
+from dao import STATUS, STATUS_DRAFT
 from services.general_service import add_to_db
 
 from .db_session import SqlAlchemyBase
@@ -27,7 +27,7 @@ class Project(SqlAlchemyBase):
         from services.contract_service import get_all_contracts_to_project
         contracts = get_all_contracts_to_project(self.id)
 
-        return f"Проект. ID: {self.id}. Название: {self.name}. Контракты:\n" + \
+        return f"Проект. ID: {self.id}. Название: {self.name}. Договоры:\n" + \
                "\n".join([str(contract) for contract in contracts])
 
 
@@ -43,7 +43,7 @@ class Contract(SqlAlchemyBase):
     project_id = mapped_column(ForeignKey("project.id"))
     project = relationship("Project", back_populates="contracts")
 
-    def __init__(self, name, data_create=datetime.now(), date_update=None, status=1, project_id=None):
+    def __init__(self, name, data_create=datetime.now(), date_update=None, status=STATUS_DRAFT, project_id=None):
         self.name = name
         self.date_create = data_create
         self.date_update = date_update
@@ -58,5 +58,8 @@ class Contract(SqlAlchemyBase):
 
         add_to_db(session, self)
 
+    def __eq__(self, other):
+        return self.id == other.id
+
     def __str__(self):
-        return f"Контракт. ID: {self.id}. Название: {self.name}. Статус: {STATUS[self.status]}"
+        return f"Договор. ID: {self.id}. Название: {self.name}. Статус: {STATUS[self.status]}"

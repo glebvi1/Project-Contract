@@ -1,5 +1,6 @@
 from typing import Optional
 
+from dao import STATUS_ACTIVATED
 from dao.db_session import create_session
 from dao.models import Contract, Project
 from services.general_service import add_to_db
@@ -7,7 +8,7 @@ from services.general_service import add_to_db
 
 def have_active_contract() -> bool:
     """Функция проверяет, если ли активные договора"""
-    return create_session().query(Contract).filter(Contract.status == 2).count() >= 1
+    return create_session().query(Contract).filter((Contract.status == STATUS_ACTIVATED) & (Contract.project_id == None)).count() >= 1
 
 
 def create_project(name: str, contract: Contract):
@@ -45,7 +46,7 @@ def check_project_havnt_active_contract(project_id) -> bool:
     from services.contract_service import get_all_contracts_to_project
 
     for contract in get_all_contracts_to_project(project_id):
-        if contract.status == 2:
+        if contract.status == STATUS_ACTIVATED:
             return False
     return True
 

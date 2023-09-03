@@ -1,5 +1,6 @@
 from typing import List, Optional
 
+from dao import STATUS_ACTIVATED, STATUS_END
 from dao.db_session import create_session
 from dao.models import Contract, Project
 from services.general_service import add_to_db
@@ -18,13 +19,13 @@ def create_contract(name: str) -> Contract:
 def confirm_contract(contract: Contract) -> None:
     """Подтверждение договора"""
     with create_session() as session:
-        contract.set_status(2, session)
+        contract.set_status(STATUS_ACTIVATED, session)
 
 
 def end_contract(contract: Contract):
     """Завершение договора"""
     with create_session() as session:
-        contract.set_status(3, session)
+        contract.set_status(STATUS_END, session)
 
 
 def get_safely_contract_by_id(contract_id: str) -> Optional[Contract]:
@@ -42,7 +43,7 @@ def get_safely_contract_by_id(contract_id: str) -> Optional[Contract]:
 
 def check_contract_is_active(contract: Contract) -> bool:
     """Функция проверяет можно ли добавить договор к проекту"""
-    return contract is not None and contract.status == 2 and __get_project_by_id(contract.project_id) is None
+    return contract is not None and contract.status == STATUS_ACTIVATED and __get_project_by_id(contract.project_id) is None
 
 
 def get_all_contracts_to_project(project_id) -> List[Contract]:

@@ -3,7 +3,9 @@ from typing import Optional
 from dao.models import Contract
 from services.contract_service import (check_contract_is_active,
                                        confirm_contract, create_contract,
-                                       end_contract, get_safely_contract_by_id)
+                                       end_contract,
+                                       get_all_contracts_to_project,
+                                       get_safely_contract_by_id)
 from services.project_service import (bind_project_to_contract,
                                       check_project_havnt_active_contract,
                                       create_project, get_all_projects,
@@ -130,7 +132,7 @@ def __process_end_contract_by_project():
     contract_id = input("Введите id договора: ")
     contract = get_safely_contract_by_id(contract_id)
 
-    if contract is None:
+    if contract is None or contract not in get_all_contracts_to_project(project.id):
         print(UNCORRECT_INPUT)
         return
 
